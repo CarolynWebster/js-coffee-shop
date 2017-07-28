@@ -17,7 +17,7 @@
         <h1>Coffee Shop</h1>
         <br>
 
-        <img id="coffee-image" src="LOLWUT" alt="make this image work with js" height="300" width="200">
+        <img id="coffee-image" src="LOLWUT" alt="make this image work with js" height="300">
 
         <h3 id="message">Click The Image To Order Coffee</h3>
 
@@ -44,97 +44,100 @@
         <button class="btn btn-default" id="clear-order">Clear order</button>
     </div>
 </div>
-
+<!--import jquery-->
+<script src="https://code.jquery.com/jquery.js"></script>
+<!--run that coffee shop!-->
 <script>
-
-    // Set these variables to their DOM elements
-
-    var myImage = document.getElementById('coffee-image');
-    var myRevenueMessage = document.getElementById('revenue');
-    //start with a base value of $0
-    myRevenueMessage.innerHTML = "<b>$0.00</b>"
-    
+    //make list to hold all orders
     var drinksOrdered = [];
 
-    var espresso = document.getElementById('espresso');
-    var latte = document.getElementById('latte');
-    var hotChocolate = document.getElementById('hot-chocolate');
+    var coffee = $('#coffee-image');
 
-    var clear = document.getElementById('clear-order');
+    //start with a base total of $0 -- appears at bottom
+    $('#revenue').html("<b>$0.00</b>");
+    
 
-    myImage.setAttribute('src', 'static/coffee_beans.jpg');
+
+
+    var drinkBeingMade = false;
+
+    //myImage.setAttribute('src', 'static/coffee_beans.jpg');
+
+    $('#coffee-image').attr('src', 'static/coffee_beans.jpg')
 
     function makeCoffee(drinkType){
+        drinkBeingMade = true;
         
         //add drinkType to drinksOrdered
         drinksOrdered.push(drinkType);
 
-        //set image to coffee machine
-        myImage.setAttribute('src', 'static/coffee_machine.jpg');
+        coffee.attr('src', 'static/brewing_coffee.gif').animate({opacity: '1'}, "slow");
         
-        //show coffee mug after 1.5 seconds
-        setTimeout(function (){
-            myImage.setAttribute('src', 'static/coffee_mug.jpg');
+        setTimeout(function () {
+        coffee.attr('src', 'static/pouring_coffee.gif').animate({opacity: '1'}, "slow");
         }, 1500);
-        
-        //change back to original beans 2.5 seconds after mug (4 seconds after function called)
-        setTimeout(function (){
-            myImage.setAttribute('src', 'static/coffee_beans.jpg');
+
+        setTimeout(function () {
+            coffee.attr('src', 'static/drinking_coffee.gif').animate({opacity: '1'}, "slow");
         }, 4000);
+
+        setTimeout(function () {
+            coffee.attr('src', 'static/coffee_beans.jpg').animate({opacity: '1'}, "slow");
+            drinkBeingMade = false;
+        }, 8000);
 
         //update the total on the page
         revenue();
     }
 
     function showDrinkType(drinkType){
-        var newImgSrc = ""
-        switch(drinkType){
-            case 'espresso': newImgSrc = "espresso"; break;
-            case 'latte': newImgSrc = "latte"; break;
-            case 'hot chocolate': newImgSrc = 'hot_chocolate'; break;
-            default: newImgSrc = 'coffee_beans'
+        if (drinkBeingMade == false){
+            var newImgSrc = ""
+            switch(drinkType){
+                case 'espresso': newImgSrc = "espresso"; break;
+                case 'latte': newImgSrc = "latte"; break;
+                case 'hot chocolate': newImgSrc = 'hot_chocolate'; break;
+                default: newImgSrc = 'coffee_beans'
+            }
+            finalSrc = "static/" + newImgSrc + ".jpg"
+            $('#coffee-image').attr('src', finalSrc)
         }
-        finalSrc = "static/" + newImgSrc + ".jpg"
-        myImage.setAttribute('src', finalSrc)
     }
 
     //add listener to coffee image and other order buttons
-    myImage.addEventListener('click', function () {
+    $('#coffee-image').on('click', function () {
         return makeCoffee('brew'); 
     });
 
     //order an espresso
-    espresso.addEventListener('click', function () {
+    $('#espresso').on('click', function () {
         return makeCoffee('espresso'); 
     });
-
-    espresso.addEventListener('mouseover', function () {
-        return showDrinkType('espresso'); 
+    //show a yummy espresso drink
+    $('#espresso').on('mouseover', function () {
+        return showDrinkType('espresso');
     });
-
-    espresso.addEventListener('mouseout', showDrinkType); 
 
     //order a latte
-    latte.addEventListener('click', function () {
+    $('#latte').on('click', function () {
         return makeCoffee('latte'); 
     });
-
-    latte.addEventListener('mouseover', function () {
+    //show a tasty latte
+    $('#latte').on('mouseover', function () {
         return showDrinkType('latte'); 
     });
 
-    latte.addEventListener('mouseout', showDrinkType); 
-
     //order a hot chocolate
-    hotChocolate.addEventListener('click', function () {
+    $('#hot-chocolate').on('click', function () {
         return makeCoffee('hot chocolate'); 
     });
-
-    hotChocolate.addEventListener('mouseover', function () {
+    //show a delicious hot chocolate
+    $('#hot-chocolate').on('mouseover', function () {
         return showDrinkType('hot chocolate'); 
     });
 
-    hotChocolate.addEventListener('mouseout', showDrinkType);
+    //mouseout for all buttons reverts main image back to beans
+    $('.btn').on('mouseout', showDrinkType)
 
     //calculate revenue total
     function revenue(){
@@ -148,16 +151,29 @@
         }
         //toFixed makes sure it uses 2 decimal places
         //adds totalRevenue amount to the page
-        myRevenueMessage.innerHTML = "<b>$" + totalRevenue.toFixed(2) + "</b>";
+        $('#revenue').html("<b>$" + totalRevenue.toFixed(2) + "</b>");
     }
 
     function clearOrder(){
+        drinkBeingMade = true;
+        //shame the user
+        coffee.attr('src', 'static/disappointed.gif')
+
+        //back to the beans after enough shaming
+        setTimeout(function () {
+            coffee.attr('src', 'static/coffee_beans.jpg').animate({opacity: '1'}, "slow");
+            drinkBeingMade = false;
+        }, 4500);
+
+        //cancel all those drink orders
         drinksOrdered = [];
+        //go back to $0 :(
         revenue();
     }
 
     //cancel your order
-    clear.addEventListener('click', clearOrder); 
+    $('#clear-order').on('click', clearOrder)
+
 
     // use this JavaScript object in further study step
 
